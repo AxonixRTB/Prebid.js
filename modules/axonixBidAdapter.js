@@ -1,59 +1,109 @@
-import * as utils from '../src/utils.js';
 import { registerBidder } from '../src/adapters/bidderFactory.js';
-import { BANNER, VIDEO, NATIVE } from '../src/mediaTypes.js';
+import { BANNER, VIDEO } from '../src/mediaTypes.js';
 import { config } from '../src/config.js';
+import * as utils from '../src/utils.js';
 
 const BIDDER_CODE = 'axonix';
 const BIDDER_VERSION = '1.0.0';
 
-// const CURRENCY = 'USD';
+const CURRENCY = 'USD';
 const ENDPOINT = 'https://openrtb-us-east-1.axonix.com/supply/prebid';
 
-// Banner sizes: [[120, 600], [300, 250], [320, 50], [468, 60], [728, 90]]
-// Video protocols: [1, 2, 3, 4, 5, 6, 7, 8]
+function getBidFloor(bidRequest, mediaType) {
+  let floorInfo = {};
+
+  if (typeof bidRequest.getFloor === 'function') {
+    floorInfo = bidRequest.getFloor({
+      currency: CURRENCY,
+      mediaType: mediaType,
+      size: '*'
+    });
+  }
+
+  return floorInfo.floor || 0;
+}
+
+function getPageUrl(bidRequest, bidderRequest) {
+  let pageUrl = config.getConfig('pageUrl');
+
+  if (bidRequest.params.referrer) {
+    pageUrl = bidRequest.params.referrer;
+  } else if (!pageUrl) {
+    pageUrl = bidderRequest.refererInfo.referer;
+  }
+
+  return bidRequest.params.secure ? pageUrl.replace(/^http:/i, 'https:') : pageUrl;
+}
+
+function isMobile() {
+  return (/(ios|ipod|ipad|iphone|android)/i).test(navigator.userAgent);
+}
+
+function isConnectedTV() {
+  return (/(smart[-]?tv|hbbtv|appletv|googletv|hdmi|netcast\.tv|viera|nettv|roku|\bdtv\b|sonydtv|inettvbrowser|\btv\b)/i).test(navigator.userAgent);
+}
 
 export const spec = {
   code: BIDDER_CODE,
   version: BIDDER_VERSION,
-  supportedMediaTypes: [BANNER, VIDEO, NATIVE],
+  supportedMediaTypes: [BANNER, VIDEO],
 
   isBidRequestValid: function(bid) {
+    // video bid request validation
+    if (bid.hasOwnProperty('mediaTypes') && bid.mediaTypes.hasOwnProperty(VIDEO)) {
+      if (!bid.mediaTypes.video.hasOwnProperty('mimes') ||
+        !utils.isArray(bid.mediaTypes.video.mimes) ||
+        bid.mediaTypes.video.mimes.length === 0) {
+        utils.logError('mimes are mandatory for video bid request. Ad Unit: ', JSON.stringify(bid));
+
+        return false;
+      }
+    }
+
     return !!(bid.params && bid.params.supplyId);
   },
 
   buildRequests: function(validBidRequests, bidderRequest) {
-    const requests = validBidRequests.map(bidRequest => {
+    // device.connectiontype
+    let connection = navigator.connection || navigator.webkitConnection;
+    let connectiontype = 0;
+
+    if (connection && connection.effectiveType) {
+      connectiontype = connection.effectiveType;
+    }
+
+    const requests = validBidRequests.map(validBidRequest => {
+      // app/site
+      let app;
+      let site;
+
+      if (typeof config.getConfig('app') === 'object') {
+        app = config.getConfig('app');
+      } else {
+        site = {
+          page: getPageUrl(validBidRequest, bidderRequest)
+        }
+      }
+
       const payload = {
-        id: bidRequest.id,
-        device: {
-          ua: navigator.userAgent,
-          js: 1,
-          dnt: (navigator.doNotTrack === 'yes' || navigator.doNotTrack === '1' || navigator.msDoNotTrack === '1') ? 1 : 0,
-          h: screen.height,
-          w: screen.width,
-          language: navigator.language
-        },
-        ext: {
-          prebidjs: {
-            prebidVersion: '$prebid.version$',
-            [bidRequest.bidder]: bidRequest.params
-          }
-        },
-        imp: [{
-          banner: utils.deepAccess(bidRequest, 'mediaTypes.banner') || undefined,
-          id: bidRequest.transactionId,
-          native: utils.deepAccess(bidRequest, 'mediaTypes.native') || undefined,
-          video: utils.deepAccess(bidRequest, 'mediaTypes.video') || undefined
-        }],
-        source: {
-          tid: bidRequest.transactionId
-        },
-        tmax: config.getConfig('bidderTimeout')
+        app,
+        site,
+        validBidRequest,
+        connectiontype,
+        devicetype: isMobile() ? 1 : isConnectedTV() ? 3 : 2,
+        bidfloor: getBidFloor(validBidRequest, bidderRequest),
+        dnt: (navigator.doNotTrack === 'yes' || navigator.doNotTrack === '1' || navigator.msDoNotTrack === '1') ? 1 : 0,
+        language: navigator.language,
+        prebidVersion: '$prebid.version$',
+        screenHeight: screen.height,
+        screenWidth: screen.width,
+        tmax: config.getConfig('bidderTimeout'),
+        ua: navigator.userAgent,
       };
 
       return {
         method: 'POST',
-        url: ENDPOINT,
+        url: `${ENDPOINT}/${validBidRequest.params.supplyId}`,
         data: payload
       };
     });
