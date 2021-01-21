@@ -111,7 +111,11 @@ export const spec = {
     return requests;
   },
 
-  interpretResponse: function(serverResponse, request) {},
+  interpretResponse: function(serverResponse, request) {
+    return serverResponse.map((response) => Object.assign(response, {
+      ttl: config.getConfig('_bidderTimeout')
+    }));
+  },
 
   onTimeout: function(timeoutData) {},
 
