@@ -11,6 +11,8 @@ describe('AxonixBidAdapter', function () {
 
   const SUPPLY_ID_1 = '91fd110a-5685-11eb-8db6-a7e0eeefbbc7';
   const SUPPLY_ID_2 = '22de2092-568b-11eb-bae3-cfa975dc72aa';
+  const REGION_1 = 'us-east-1';
+  const REGION_2 = 'eu-west-1';
 
   describe('inherited functions', function () {
     it('exists and is a function', function () {
@@ -24,12 +26,14 @@ describe('AxonixBidAdapter', function () {
         bidder: 'axonix',
         params: {
           supplyId: SUPPLY_ID_1,
+          region: REGION_1
         },
       },
       {
         bidder: 'axonix',
         params: {
           supplyId: SUPPLY_ID_2,
+          region: REGION_2
         },
         future_parameter: {
           future: 'ididid'

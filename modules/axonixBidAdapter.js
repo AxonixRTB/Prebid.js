@@ -7,7 +7,6 @@ const BIDDER_CODE = 'axonix';
 const BIDDER_VERSION = '1.0.0';
 
 const CURRENCY = 'USD';
-const ENDPOINT = 'https://openrtb-us-east-1.axonix.com/supply/prebid';
 
 function getBidFloor(bidRequest, mediaType) {
   let floorInfo = {};
@@ -60,7 +59,7 @@ export const spec = {
       }
     }
 
-    return !!(bid.params && bid.params.supplyId);
+    return !!(bid.params && bid.params.supplyId && bid.params.region);
   },
 
   buildRequests: function(validBidRequests, bidderRequest) {
@@ -73,6 +72,7 @@ export const spec = {
     }
 
     const requests = validBidRequests.map(validBidRequest => {
+      const { region, supplyId } = validBidRequest.params;
       // app/site
       let app;
       let site;
@@ -103,7 +103,7 @@ export const spec = {
 
       return {
         method: 'POST',
-        url: `${ENDPOINT}/${validBidRequest.params.supplyId}`,
+        url: `https://openrtb-${region}.axonix.com/supply/prebid/${supplyId}`,
         data: payload
       };
     });

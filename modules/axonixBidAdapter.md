@@ -25,7 +25,8 @@ var bannerAdUnit = {
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 };
@@ -44,7 +45,8 @@ var videoAdUnit = {
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 };
@@ -63,7 +65,8 @@ var nativeAdUnit = {
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 };
@@ -83,7 +86,8 @@ var adUnits = [
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 },
@@ -97,7 +101,8 @@ var adUnits = [
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 },
@@ -111,7 +116,8 @@ var adUnits = [
   bids: [{
     bidder: 'axonix',
     params: {
-      supplyId: 'abc'
+      supplyId: 'abc',
+      region: 'def'
     }
   }]
 }
