@@ -7,6 +7,7 @@ const BIDDER_CODE = 'axonix';
 const BIDDER_VERSION = '1.0.0';
 
 const CURRENCY = 'USD';
+const DEFAULT_REGION = 'us-east-1';
 
 function getBidFloor(bidRequest, mediaType) {
   let floorInfo = {};
@@ -72,10 +73,14 @@ export const spec = {
     }
 
     const requests = validBidRequests.map(validBidRequest => {
-      const { region, supplyId } = validBidRequest.params;
+      let { region, supplyId } = validBidRequest.params;
       // app/site
       let app;
       let site;
+
+      if (!region) {
+        region = DEFAULT_REGION;
+      }
 
       if (typeof config.getConfig('app') === 'object') {
         app = config.getConfig('app');
@@ -85,7 +90,7 @@ export const spec = {
         }
       }
 
-      const payload = {
+      const data = {
         app,
         site,
         validBidRequest,
@@ -104,7 +109,7 @@ export const spec = {
       return {
         method: 'POST',
         url: `https://openrtb-${region}.axonix.com/supply/prebid/${supplyId}`,
-        data: payload
+        data
       };
     });
 
@@ -112,6 +117,10 @@ export const spec = {
   },
 
   interpretResponse: function(serverResponse, request) {
+    if (!utils.isArray(serverResponse)) {
+      return [];
+    }
+
     return serverResponse.map((response) => Object.assign(response, {
       ttl: config.getConfig('_bidderTimeout')
     }));
@@ -119,7 +128,14 @@ export const spec = {
 
   onTimeout: function(timeoutData) {},
 
-  onBidWon: function(bid) {},
+  onBidWon: function(bid) {
+    const { nurl } = bid || {};
+
+    if (!utils.isEmptyStr(nurl)) {
+      utils.replaceAuctionPrice(nurl, bid.cpm)
+      utils.triggerPixel(nurl, null);
+    };
+  },
 
   onSetTargeting: function(bid) {}
 }
