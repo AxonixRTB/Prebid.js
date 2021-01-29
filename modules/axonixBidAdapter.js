@@ -60,7 +60,7 @@ export const spec = {
       }
     }
 
-    return !!(bid.params && bid.params.supplyId && bid.params.region);
+    return !!(bid.params && bid.params.supplyId);
   },
 
   buildRequests: function(validBidRequests, bidderRequest) {
@@ -73,10 +73,20 @@ export const spec = {
     }
 
     const requests = validBidRequests.map(validBidRequest => {
-      let { region, supplyId } = validBidRequest.params;
+      let { supplyId, region, endpoint } = validBidRequest.params;
       // app/site
       let app;
       let site;
+
+      let url;
+
+      if (endpoint) {
+        url = endpoint;
+      } else if (region) {
+        url = `https://openrtb-${region}.axonix.com/supply/prebid/${supplyId}`;
+      } else {
+        url = `https://openrtb-${DEFAULT_REGION}.axonix.com/supply/prebid/${supplyId}`
+      }
 
       if (!region) {
         region = DEFAULT_REGION;
@@ -108,7 +118,7 @@ export const spec = {
 
       return {
         method: 'POST',
-        url: `https://openrtb-${region}.axonix.com/supply/prebid/${supplyId}`,
+        url,
         data
       };
     });

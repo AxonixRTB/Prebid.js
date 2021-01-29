@@ -10,6 +10,14 @@ Maintainer  : support-prebid@axonix.com
 
 Module that connects to Axonix's exchange for bids.
 
+# Parameters
+
+| Name          | Scope    | Description                         | Example                                |
+| :------------ | :------- | :---------------------------------- | :------------------------------------- |
+| `supplyId`    | required | Supply UUID                         | `2c426f78-bb18-4a16-abf4-62c6cd0ee8de` |
+| `region`      | optional | Cloud region                        | `us-east-1`                            |
+| `endpoint`    | optional | Supply custom endpoint              | `https://open-rtb.axonix.com/custom`   |
+
 # Test Parameters
 
 ## Banner
@@ -26,7 +34,8 @@ var bannerAdUnit = {
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 };
@@ -46,7 +55,8 @@ var videoAdUnit = {
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 };
@@ -66,7 +76,8 @@ var nativeAdUnit = {
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 };
@@ -87,7 +98,8 @@ var adUnits = [
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 },
@@ -102,7 +114,8 @@ var adUnits = [
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 },
@@ -117,7 +130,8 @@ var adUnits = [
     bidder: 'axonix',
     params: {
       supplyId: 'abc',
-      region: 'def'
+      region: 'def',
+      endpoint: 'url'
     }
   }]
 }
