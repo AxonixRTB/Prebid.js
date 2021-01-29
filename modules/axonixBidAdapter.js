@@ -88,10 +88,6 @@ export const spec = {
         url = `https://openrtb-${DEFAULT_REGION}.axonix.com/supply/prebid/${supplyId}`
       }
 
-      if (!region) {
-        region = DEFAULT_REGION;
-      }
-
       if (typeof config.getConfig('app') === 'object') {
         app = config.getConfig('app');
       } else {
