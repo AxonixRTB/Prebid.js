@@ -3,7 +3,7 @@
 ```
 Module Name : Axonix Bidder Adapter
 Module Type : Bidder Adapter
-Maintainer  : support@axonix.com
+Maintainer  : support-prebid@axonix.com
 ```
 
 # Description
