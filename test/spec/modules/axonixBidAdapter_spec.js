@@ -14,6 +14,26 @@ describe('AxonixBidAdapter', function () {
   const REGION_1 = 'us-east-1';
   const REGION_2 = 'eu-west-1';
 
+  const DEFAULT_PARAMS = [{
+    adUnitCode: 'ad_code',
+    bidId: 'abcd1234',
+    mediaTypes: {
+      banner: {
+        sizes: [
+          [300, 250],
+          [300, 200]
+        ]
+      }
+    },
+    bidder: 'axonix',
+    params: {
+      supplyId: SUPPLY_ID_1,
+      region: REGION_1
+    },
+    requestId: 'q4owht8ofqi3ulwsd',
+    transactionId: 'fvpq3oireansdwo'
+  }];
+
   describe('inherited functions', function () {
     it('exists and is a function', function () {
       expect(adapter.callBids).to.exist.and.to.be.a('function');
@@ -70,7 +90,41 @@ describe('AxonixBidAdapter', function () {
       //   set supply id
       //   set region/endpoint in ssp config
       //   call buildRequests, validate request (url, method, supply id)
-      expect.fail('Not implemented');
+      const bidderRequest = {
+        bidderCode: 'a4g',
+        auctionId: '18fd8b8b0bd757',
+        bidderRequestId: '418b37f85e772c',
+        timeout: 3000,
+        gdprConsent: {
+          consentString: 'BOKAVy4OKAVy4ABAB8AAAAAZ+A==',
+          gdprApplies: true
+        },
+        refererInfo: {
+          referer: 'https://www.prebid.org',
+          canonicalUrl: 'https://www.prebid.org/the/link/to/the/page'
+        }
+      };
+
+      const [request] = spec.buildRequests(DEFAULT_PARAMS, bidderRequest);
+
+      expect(request).to.have.property('url', `https://openrtb-${REGION_1}.axonix.com/supply/prebid/${SUPPLY_ID_1}`);
+      expect(request).to.have.property('method', 'POST');
+      expect(request).to.have.property('data');
+
+      const { data } = request;
+      expect(data).to.have.property('app');
+      expect(data).to.have.property('site');
+      expect(data).to.have.property('validBidRequest');
+      expect(data).to.have.property('connectiontype');
+      expect(data).to.have.property('devicetype');
+      expect(data).to.have.property('bidfloor');
+      expect(data).to.have.property('dnt');
+      expect(data).to.have.property('language');
+      expect(data).to.have.property('prebidVersion');
+      expect(data).to.have.property('screenHeight');
+      expect(data).to.have.property('screenWidth');
+      expect(data).to.have.property('tmax');
+      expect(data).to.have.property('ua');
     });
 
     it('creates ServerRequests pointing to default endpoint if missing', function () {

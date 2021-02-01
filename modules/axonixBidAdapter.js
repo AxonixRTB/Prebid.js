@@ -9,13 +9,13 @@ const BIDDER_VERSION = '1.0.0';
 const CURRENCY = 'USD';
 const DEFAULT_REGION = 'us-east-1';
 
-function getBidFloor(bidRequest, mediaType) {
+function getBidFloor(bidRequest) {
   let floorInfo = {};
 
   if (typeof bidRequest.getFloor === 'function') {
     floorInfo = bidRequest.getFloor({
       currency: CURRENCY,
-      mediaType: mediaType,
+      mediaType: '*',
       size: '*'
     });
   }
@@ -102,7 +102,7 @@ export const spec = {
         validBidRequest,
         connectiontype,
         devicetype: isMobile() ? 1 : isConnectedTV() ? 3 : 2,
-        bidfloor: getBidFloor(validBidRequest, bidderRequest),
+        bidfloor: getBidFloor(validBidRequest),
         dnt: (navigator.doNotTrack === 'yes' || navigator.doNotTrack === '1' || navigator.msDoNotTrack === '1') ? 1 : 0,
         language: navigator.language,
         prebidVersion: '$prebid.version$',
