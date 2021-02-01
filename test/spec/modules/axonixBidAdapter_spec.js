@@ -14,7 +14,7 @@ describe('AxonixBidAdapter', function () {
   const REGION_1 = 'us-east-1';
   const REGION_2 = 'eu-west-1';
 
-  const DEFAULT_PARAMS = [{
+  const BANNER_REQUEST = [{
     adUnitCode: 'ad_code',
     bidId: 'abcd1234',
     mediaTypes: {
@@ -34,9 +34,48 @@ describe('AxonixBidAdapter', function () {
     transactionId: 'fvpq3oireansdwo'
   }];
 
+  const VIDEO_REQUEST = [{
+    adUnitCode: 'ad_code',
+    bidId: 'abcd1234',
+    mediaTypes: {
+      video: {
+        context: 'outstream',
+        mimes: ['video/mp4'],
+        playerSize: [[400, 300]],
+        renderer: {
+          url: 'https://url.com',
+          backupOnly: true,
+          render: () => true
+        },
+      }
+    },
+    bidder: 'axonix',
+    params: {
+      supplyId: SUPPLY_ID_1,
+      region: REGION_1
+    },
+    requestId: 'q4owht8ofqi3ulwsd',
+    transactionId: 'fvpq3oireansdwo'
+  }];
+
+  const BIDDER_REQUEST = {
+    bidderCode: 'a4g',
+    auctionId: '18fd8b8b0bd757',
+    bidderRequestId: '418b37f85e772c',
+    timeout: 3000,
+    gdprConsent: {
+      consentString: 'BOKAVy4OKAVy4ABAB8AAAAAZ+A==',
+      gdprApplies: true
+    },
+    refererInfo: {
+      referer: 'https://www.prebid.org',
+      canonicalUrl: 'https://www.prebid.org/the/link/to/the/page'
+    }
+  };
+
   describe('inherited functions', function () {
     it('exists and is a function', function () {
-      expect(adapter.callBids).to.exist.and.to.be.a('function');
+      expect(adapter.callBids).to.exist.and.to.be.a.a('function');
     });
   });
 
@@ -85,46 +124,34 @@ describe('AxonixBidAdapter', function () {
   });
 
   describe('buildRequests: can handle banner ad requests', function () {
-    it('creates ServerRequests pointing to the correct region and endpoint if it changes', function () {
-      // loop:
-      //   set supply id
-      //   set region/endpoint in ssp config
-      //   call buildRequests, validate request (url, method, supply id)
-      const bidderRequest = {
-        bidderCode: 'a4g',
-        auctionId: '18fd8b8b0bd757',
-        bidderRequestId: '418b37f85e772c',
-        timeout: 3000,
-        gdprConsent: {
-          consentString: 'BOKAVy4OKAVy4ABAB8AAAAAZ+A==',
-          gdprApplies: true
-        },
-        refererInfo: {
-          referer: 'https://www.prebid.org',
-          canonicalUrl: 'https://www.prebid.org/the/link/to/the/page'
-        }
-      };
-
-      const [request] = spec.buildRequests(DEFAULT_PARAMS, bidderRequest);
+    it('creates ServerRequests with the correct data', function () {
+      const [request] = spec.buildRequests(BANNER_REQUEST, BIDDER_REQUEST);
 
       expect(request).to.have.property('url', `https://openrtb-${REGION_1}.axonix.com/supply/prebid/${SUPPLY_ID_1}`);
       expect(request).to.have.property('method', 'POST');
       expect(request).to.have.property('data');
 
       const { data } = request;
-      expect(data).to.have.property('app');
+      expect(data.app).to.be.undefined;
+
       expect(data).to.have.property('site');
-      expect(data).to.have.property('validBidRequest');
-      expect(data).to.have.property('connectiontype');
-      expect(data).to.have.property('devicetype');
-      expect(data).to.have.property('bidfloor');
-      expect(data).to.have.property('dnt');
-      expect(data).to.have.property('language');
-      expect(data).to.have.property('prebidVersion');
-      expect(data).to.have.property('screenHeight');
-      expect(data).to.have.property('screenWidth');
-      expect(data).to.have.property('tmax');
-      expect(data).to.have.property('ua');
+      expect(data.site).to.have.property('page', 'https://www.prebid.org');
+
+      expect(data).to.have.property('validBidRequest', BANNER_REQUEST[0]);
+      expect(data).to.have.property('connectiontype', 0);
+      expect(data).to.have.property('devicetype', 2);
+      expect(data).to.have.property('bidfloor', 0);
+      expect(data).to.have.property('dnt', 0);
+      expect(data).to.have.property('language').to.be.a('string');
+      expect(data).to.have.property('prebidVersion').to.be.a('string');
+      expect(data).to.have.property('screenHeight').to.be.a('number');
+      expect(data).to.have.property('screenWidth').to.be.a('number');
+      expect(data).to.have.property('tmax').to.be.a('number');
+      expect(data).to.have.property('ua').to.be.a('string');
+    });
+
+    it('creates ServerRequests pointing to the correct region and endpoint if it changes', function () {
+      expect.fail('Not implemented');
     });
 
     it('creates ServerRequests pointing to default endpoint if missing', function () {
@@ -139,6 +166,32 @@ describe('AxonixBidAdapter', function () {
   });
 
   describe('buildRequests: can handle video ad requests', function () {
+    it('creates ServerRequests with the correct data', function () {
+      const [request] = spec.buildRequests(VIDEO_REQUEST, BIDDER_REQUEST);
+
+      expect(request).to.have.property('url', `https://openrtb-${REGION_1}.axonix.com/supply/prebid/${SUPPLY_ID_1}`);
+      expect(request).to.have.property('method', 'POST');
+      expect(request).to.have.property('data');
+
+      const { data } = request;
+      expect(data.app).to.be.undefined;
+
+      expect(data).to.have.property('site');
+      expect(data.site).to.have.property('page', 'https://www.prebid.org');
+
+      expect(data).to.have.property('validBidRequest', VIDEO_REQUEST[0]);
+      expect(data).to.have.property('connectiontype', 0);
+      expect(data).to.have.property('devicetype', 2);
+      expect(data).to.have.property('bidfloor', 0);
+      expect(data).to.have.property('dnt', 0);
+      expect(data).to.have.property('language').to.be.a('string');
+      expect(data).to.have.property('prebidVersion').to.be.a('string');
+      expect(data).to.have.property('screenHeight').to.be.a('number');
+      expect(data).to.have.property('screenWidth').to.be.a('number');
+      expect(data).to.have.property('tmax').to.be.a('number');
+      expect(data).to.have.property('ua').to.be.a('string');
+    });
+
     it('creates ServerRequests pointing to the correct region and endpoint if it changes', function () {
       // loop:
       //   set supply id
