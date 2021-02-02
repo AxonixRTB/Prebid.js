@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { spec } from 'modules/axonixBidAdapter.js';
-import { newBidder } from 'src/adapters/bidderFactory.js';
-import * as utils from 'src/utils.js';
+import { spec } from 'modules/axonixBidAdapter';
+import { newBidder } from 'src/adapters/bidderFactory';
+import * as utils from 'src/utils';
 
 describe('AxonixBidAdapter', function () {
   const adapter = newBidder(spec);
@@ -67,6 +67,56 @@ describe('AxonixBidAdapter', function () {
     refererInfo: {
       referer: 'https://www.prebid.org',
       canonicalUrl: 'https://www.prebid.org/the/link/to/the/page'
+    }
+  };
+
+  const BANNER_RESPONSE = {
+    body: {
+      requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+      supplyId: '2f59378a-107c-4e6b-b69d-493174aece86',
+      cpm: 6,
+      currency: 'USD',
+      width: 300,
+      height: 250,
+      ad: '<html></html>',
+      creativeId: 'abc',
+      netRevenue: false,
+      meta: {
+        networkId: 'nid',
+        advertiserDomains: [
+          'https://the.url'
+        ],
+        secondaryCatIds: [
+          'IAB1'
+        ],
+        mediaType: 'banner'
+      },
+      nurl: 'https://win.url'
+    }
+  };
+
+  const VIDEO_RESPONSE = {
+    body: {
+      requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+      supplyId: 'c2d5cd68-b19d-4aad-ab64-4ab77853ae36',
+      cpm: 6,
+      currency: 'USD',
+      width: 300,
+      height: 250,
+      ad: '<?xml version="1.0" encoding="UTF-8" ?><VAST version="3.0"></VAST>',
+      creativeId: 'abc',
+      netRevenue: false,
+      meta: {
+        networkId: 'nid',
+        advertiserDomains: [
+          'https://the.url'
+        ],
+        secondaryCatIds: [
+          'IAB1'
+        ],
+        mediaType: 'video'
+      },
+      nurl: 'https://win.url'
     }
   };
 
@@ -268,65 +318,17 @@ describe('AxonixBidAdapter', function () {
     });
 
     it('parses banner responses', function () {
-      const serverResponse = {
-        body: {
-          requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-          cpm: 6,
-          currency: 'USD',
-          width: 300,
-          height: 250,
-          ad: '<html></html>',
-          creativeId: 'abc',
-          netRevenue: false,
-          meta: {
-            networkId: 'nid',
-            advertiserDomains: [
-              'https://the.url'
-            ],
-            secondaryCatIds: [
-              'IAB1'
-            ],
-            mediaType: 'banner'
-          },
-          nurl: 'https://win.url'
-        }
-      };
-
-      const response = spec.interpretResponse(serverResponse);
+      const response = spec.interpretResponse(BANNER_RESPONSE);
 
       expect(response).to.be.an('array').that.is.not.empty;
-      expect(response[0]).to.equal(serverResponse.body);
+      expect(response[0]).to.equal(BANNER_RESPONSE.body);
     });
 
     it('parses 1 video responses', function () {
-      const serverResponse = {
-        body: {
-          requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-          cpm: 6,
-          currency: 'USD',
-          width: 300,
-          height: 250,
-          ad: '<html></html>',
-          creativeId: 'abc',
-          netRevenue: false,
-          meta: {
-            networkId: 'nid',
-            advertiserDomains: [
-              'https://the.url'
-            ],
-            secondaryCatIds: [
-              'IAB1'
-            ],
-            mediaType: 'banner'
-          },
-          nurl: 'https://win.url'
-        }
-      };
-
-      const response = spec.interpretResponse(serverResponse);
+      const response = spec.interpretResponse(VIDEO_RESPONSE);
 
       expect(response).to.be.an('array').that.is.not.empty;
-      expect(response[0]).to.equal(serverResponse.body);
+      expect(response[0]).to.equal(VIDEO_RESPONSE.body);
     });
 
     it.skip('parses 1 native responses', function () {
@@ -360,6 +362,16 @@ describe('AxonixBidAdapter', function () {
       var response = spec.onBidWon({});
       expect(utils.triggerPixel.called).to.equal(false);
       expect(response).to.be.an('undefined')
+    });
+  });
+
+  describe('onTimeout', function () {
+    it('banner response', () => {
+      spec.onTimeout(spec.interpretResponse(BANNER_RESPONSE));
+    });
+
+    it('video response', () => {
+      spec.onTimeout(spec.interpretResponse(VIDEO_RESPONSE));
     });
   });
 });

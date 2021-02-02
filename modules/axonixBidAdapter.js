@@ -2,6 +2,7 @@ import { registerBidder } from '../src/adapters/bidderFactory.js';
 import { BANNER, VIDEO } from '../src/mediaTypes.js';
 import { config } from '../src/config.js';
 import * as utils from '../src/utils.js';
+import { ajax } from '../src/ajax.js';
 
 const BIDDER_CODE = 'axonix';
 const BIDDER_VERSION = '1.0.0';
@@ -43,6 +44,21 @@ function isConnectedTV() {
   return (/(smart[-]?tv|hbbtv|appletv|googletv|hdmi|netcast\.tv|viera|nettv|roku|\bdtv\b|sonydtv|inettvbrowser|\btv\b)/i).test(navigator.userAgent);
 }
 
+function getURL(params, path) {
+  let { supplyId, region, endpoint } = params;
+  let url;
+
+  if (endpoint) {
+    url = endpoint;
+  } else if (region) {
+    url = `https://openrtb-${region}.axonix.com/supply/${path}/${supplyId}`;
+  } else {
+    url = `https://openrtb-${DEFAULT_REGION}.axonix.com/supply/${path}/${supplyId}`
+  }
+
+  return url;
+}
+
 export const spec = {
   code: BIDDER_CODE,
   version: BIDDER_VERSION,
@@ -73,20 +89,9 @@ export const spec = {
     }
 
     const requests = validBidRequests.map(validBidRequest => {
-      let { supplyId, region, endpoint } = validBidRequest.params;
       // app/site
       let app;
       let site;
-
-      let url;
-
-      if (endpoint) {
-        url = endpoint;
-      } else if (region) {
-        url = `https://openrtb-${region}.axonix.com/supply/prebid/${supplyId}`;
-      } else {
-        url = `https://openrtb-${DEFAULT_REGION}.axonix.com/supply/prebid/${supplyId}`
-      }
 
       if (typeof config.getConfig('app') === 'object') {
         app = config.getConfig('app');
@@ -114,7 +119,7 @@ export const spec = {
 
       return {
         method: 'POST',
-        url,
+        url: getURL(validBidRequest.params, 'prebid'),
         data
       };
     });
@@ -138,7 +143,9 @@ export const spec = {
     ];
   },
 
-  onTimeout: function(timeoutData) {},
+  onTimeout: function(timeoutData) {
+    ajax(getURL(timeoutData[0], 'prebid/timeout'), null, timeoutData[0], { method: 'POST' });
+  },
 
   onBidWon: function(bid) {
     const { nurl } = bid || {};
@@ -147,9 +154,7 @@ export const spec = {
       utils.replaceAuctionPrice(nurl, bid.cpm)
       utils.triggerPixel(nurl);
     };
-  },
-
-  onSetTargeting: function(bid) {}
+  }
 }
 
 registerBidder(spec);
