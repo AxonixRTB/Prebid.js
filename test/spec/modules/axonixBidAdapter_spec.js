@@ -41,7 +41,7 @@ describe('AxonixBidAdapter', function () {
       video: {
         context: 'outstream',
         mimes: ['video/mp4'],
-        playerSize: [[400, 300]],
+        playerSize: [400, 300],
         renderer: {
           url: 'https://url.com',
           backupOnly: true,
@@ -301,22 +301,39 @@ describe('AxonixBidAdapter', function () {
       expect(response[0]).to.equal(serverResponse.body);
     });
 
-    it.skip('parses multiple banner responses', function () {
-      // passing N valid banners in a response generates an array with 1 correct prebid response
-      //
-      // validate it returnes an array of type Bid defined in {@link file://./../../../src/adapters/bidderFactory.js}
-      expect.fail('Not implemented');
-    });
+    it('parses 1 video responses', function () {
+      const serverResponse = {
+        body: {
+          requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+          cpm: 6,
+          currency: 'USD',
+          width: 300,
+          height: 250,
+          ad: '<html></html>',
+          creativeId: 'abc',
+          netRevenue: false,
+          meta: {
+            networkId: 'nid',
+            advertiserDomains: [
+              'https://the.url'
+            ],
+            secondaryCatIds: [
+              'IAB1'
+            ],
+            mediaType: 'banner'
+          },
+          nurl: 'https://win.url'
+        }
+      };
 
-    it.skip('parses 1 video responses', function () {
-      // passing 1 valid video in a response generates an array with 1 correct prebid response
-      // examine mediaType:video, vastXml and vastUrl
-      // check isValidVideoBid from {@link file://./../../../src/video.js}
-      expect.fail('Not implemented');
+      const response = spec.interpretResponse(serverResponse);
+
+      expect(response).to.be.an('array').that.is.not.empty;
+      expect(response[0]).to.equal(serverResponse.body);
     });
 
     it.skip('parses 1 native responses', function () {
-      // passing 1 valid video in a response generates an array with 1 correct prebid response
+      // passing 1 valid native in a response generates an array with 1 correct prebid response
       // examine mediaType:native, native element
       // check nativeBidIsValid from {@link file://./../../../src/native.js}
       expect.fail('Not implemented');
