@@ -259,39 +259,63 @@ describe('AxonixBidAdapter', function () {
     });
   });
 
-  describe.skip('interpretResponse', function () {
+  describe('interpretResponse', function () {
     it('considers corner cases', function() {
-      // passing null/undefined returns []
-      expect.fail('Not implemented');
-    })
-
-    it('ignores unparseable responses', function() {
-      // passing invalid object returns [], no throws
-      expect.fail('Not implemented');
-    })
-
-    it('parses banner responses', function () {
-      // passing 1 valid banner response generates an array with 1 correct prebid response
-      //
-      // validate it returnes an array of type Bid defined in {@link file://./../../../src/adapters/bidderFactory.js}
-      expect.fail('Not implemented');
+      expect(spec.interpretResponse(null)).to.be.an('array').that.is.empty;
+      expect(spec.interpretResponse()).to.be.an('array').that.is.empty;
     });
 
-    it('parses multiple banner responses', function () {
+    it('ignores unparseable responses', function() {
+      expect(spec.interpretResponse('invalid')).to.be.an('array').that.is.empty;
+      expect(spec.interpretResponse({ invalid: 'object' })).to.be.an('array').that.is.empty;
+    });
+
+    it('parses banner responses', function () {
+      const serverResponse = {
+        body: {
+          requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+          cpm: 6,
+          currency: 'USD',
+          width: 300,
+          height: 250,
+          ad: '<html></html>',
+          creativeId: 'abc',
+          netRevenue: false,
+          meta: {
+            networkId: 'nid',
+            advertiserDomains: [
+              'https://the.url'
+            ],
+            secondaryCatIds: [
+              'IAB1'
+            ],
+            mediaType: 'banner'
+          },
+          nurl: 'https://win.url'
+        }
+      };
+
+      const response = spec.interpretResponse(serverResponse);
+
+      expect(response).to.be.an('array').that.is.not.empty;
+      expect(response[0]).to.equal(serverResponse.body);
+    });
+
+    it.skip('parses multiple banner responses', function () {
       // passing N valid banners in a response generates an array with 1 correct prebid response
       //
       // validate it returnes an array of type Bid defined in {@link file://./../../../src/adapters/bidderFactory.js}
       expect.fail('Not implemented');
     });
 
-    it('parses 1 video responses', function () {
+    it.skip('parses 1 video responses', function () {
       // passing 1 valid video in a response generates an array with 1 correct prebid response
       // examine mediaType:video, vastXml and vastUrl
       // check isValidVideoBid from {@link file://./../../../src/video.js}
       expect.fail('Not implemented');
     });
 
-    it('parses 1 native responses', function () {
+    it.skip('parses 1 native responses', function () {
       // passing 1 valid video in a response generates an array with 1 correct prebid response
       // examine mediaType:native, native element
       // check nativeBidIsValid from {@link file://./../../../src/native.js}

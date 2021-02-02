@@ -122,14 +122,20 @@ export const spec = {
     return requests;
   },
 
-  interpretResponse: function(serverResponse, request) {
-    if (!utils.isArray(serverResponse)) {
+  interpretResponse: function(serverResponse) {
+    if (!utils.isPlainObject(serverResponse) || !serverResponse.body) {
       return [];
     }
 
-    return serverResponse.map((response) => Object.assign(response, {
+    const response = serverResponse.body;
+
+    Object.assign(response, {
       ttl: config.getConfig('_bidderTimeout')
-    }));
+    });
+
+    return [
+      response
+    ];
   },
 
   onTimeout: function(timeoutData) {},
