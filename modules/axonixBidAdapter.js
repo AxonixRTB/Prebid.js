@@ -143,9 +143,9 @@ export const spec = {
   onBidWon: function(bid) {
     const { nurl } = bid || {};
 
-    if (!utils.isEmptyStr(nurl)) {
+    if (bid.nurl) {
       utils.replaceAuctionPrice(nurl, bid.cpm)
-      utils.triggerPixel(nurl, null);
+      utils.triggerPixel(nurl);
     };
   },
 

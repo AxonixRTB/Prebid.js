@@ -2,9 +2,6 @@ import { expect } from 'chai';
 import { spec } from 'modules/axonixBidAdapter.js';
 import { newBidder } from 'src/adapters/bidderFactory.js';
 import * as utils from 'src/utils.js';
-// import * as bidderFactory from 'src/adapters/bidderFactory.js';
-// import { auctionManager } from 'src/auctionManager.js';
-// import { config } from 'src/config.js';
 
 describe('AxonixBidAdapter', function () {
   const adapter = newBidder(spec);
@@ -340,7 +337,7 @@ describe('AxonixBidAdapter', function () {
     });
   });
 
-  describe.skip('onBidWon', function () {
+  describe('onBidWon', function () {
     beforeEach(function () {
       sinon.stub(utils, 'triggerPixel');
     });
@@ -349,47 +346,20 @@ describe('AxonixBidAdapter', function () {
       utils.triggerPixel.restore();
     });
 
-    it('winning a bid triggers a call to our pixel', function () {
-      // our onBidWon should be simply forwarding all received to our endpoint
+    it('called once', function () {
+      spec.onBidWon({ cpm: '2.21', nurl: 'https://win.url/' });
+      expect(utils.triggerPixel.calledOnce).to.equal(true);
+    });
 
-      // onBidWon implementation approach:
-      // if (typeof bid.nurl !== 'undefined') {
-      //   const cpm = bid.pbMg;
-      //   bid.nurl = bid.nurl.replace(
-      //     /\$\{AUCTION_PRICE\}/,
-      //     cpm
-      //   );
-      //   utils.triggerPixel(bid.nurl, null);
-      // };
-      //
-      // see prebid.js
-      //  * @property {string} pbAg Auto granularity price bucket; CPM <= 5 ? increment = 0.05 : CPM > 5 && CPM <= 10 ? increment = 0.10 : CPM > 10 && CPM <= 20 ? increment = 0.50 : CPM > 20 ? priceCap = 20.00.  Example: `"0.80"`.
-      //  * @property {string} pbCg Custom price bucket.  For example setup, see {@link setPriceGranularity}.  Example: `"0.84"`.
-      //  * @property {string} pbDg Dense granularity price bucket; CPM <= 3 ? increment = 0.01 : CPM > 3 && CPM <= 8 ? increment = 0.05 : CPM > 8 && CPM <= 20 ? increment = 0.50 : CPM > 20? priceCap = 20.00.  Example: `"0.84"`.
-      //  * @property {string} pbLg Low granularity price bucket; $0.50 increment, capped at $5, floored to two decimal places.  Example: `"0.50"`.
-      //  * @property {string} pbMg Medium granularity price bucket; $0.10 increment, capped at $20, floored to two decimal places.  Example: `"0.80"`.
-      //  * @property {string} pbHg High granularity price bucket; $0.01 increment, capped at $20, floored to two decimal places.  Example: `"0.84"`.
-
-      // test body:
-      //
-      // const bids = [
-      //   {bidder: 'axonix', params: {supplyId: 'id'}},
-      // ];
-      // const adUnits = [{
-      //   code: 'our-ad-code',
-      //   sizes: [[728, 90]],
-      //   bids
-      // }];
-      // // onBidWon is called with a Bid object
-      // // see {@link file://./../unit/core/adapterManager_spec.js}
-      // spec.onBidWon(bids[0]);
-      // expect(utils.triggerPixel.calledOnce).to.equal(true);
-      expect.fail('Not implemented');
+    it('called false', function () {
+      spec.onBidWon({ cpm: '2.21' });
+      expect(utils.triggerPixel.called).to.equal(false);
     });
 
     it('when there is no notification expected server side, none is called', function () {
-      // call onBidWon without a nurl, expect no calls
-      expect.fail('Not implemented');
+      var response = spec.onBidWon({});
+      expect(utils.triggerPixel.called).to.equal(false);
+      expect(response).to.be.an('undefined')
     });
   });
 });
