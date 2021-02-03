@@ -128,19 +128,21 @@ export const spec = {
   },
 
   interpretResponse: function(serverResponse) {
-    if (!utils.isPlainObject(serverResponse) || !serverResponse.body) {
+    if (!utils.isArray(serverResponse)) {
       return [];
     }
 
-    const response = serverResponse.body;
+    const responses = [];
 
-    Object.assign(response, {
-      ttl: config.getConfig('_bidderTimeout')
-    });
+    for (const response of serverResponse) {
+      if (response.requestId && response.supplyId) {
+        responses.push(Object.assign(response, {
+          ttl: config.getConfig('_bidderTimeout')
+        }));
+      }
+    }
 
-    return [
-      response
-    ];
+    return responses;
   },
 
   onTimeout: function(timeoutData) {

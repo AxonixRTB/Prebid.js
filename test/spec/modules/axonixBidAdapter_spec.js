@@ -71,58 +71,54 @@ describe('AxonixBidAdapter', function () {
   };
 
   const BANNER_RESPONSE = {
-    body: {
-      requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-      supplyId: '2f59378a-107c-4e6b-b69d-493174aece86',
-      cpm: 6,
-      currency: 'USD',
-      width: 300,
-      height: 250,
-      ad: '<html></html>',
-      creativeId: 'abc',
-      netRevenue: false,
-      meta: {
-        networkId: 'nid',
-        advertiserDomains: [
-          'https://the.url'
-        ],
-        secondaryCatIds: [
-          'IAB1'
-        ],
-        mediaType: 'banner'
-      },
-      nurl: 'https://win.url'
-    }
+    requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+    supplyId: '2f59378a-107c-4e6b-b69d-493174aece86',
+    cpm: 6,
+    currency: 'USD',
+    width: 300,
+    height: 250,
+    ad: '<html></html>',
+    creativeId: 'abc',
+    netRevenue: false,
+    meta: {
+      networkId: 'nid',
+      advertiserDomains: [
+        'https://the.url'
+      ],
+      secondaryCatIds: [
+        'IAB1'
+      ],
+      mediaType: 'banner'
+    },
+    nurl: 'https://win.url'
   };
 
   const VIDEO_RESPONSE = {
-    body: {
-      requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-      supplyId: 'c2d5cd68-b19d-4aad-ab64-4ab77853ae36',
-      cpm: 6,
-      currency: 'USD',
-      width: 300,
-      height: 250,
-      ad: '<?xml version="1.0" encoding="UTF-8" ?><VAST version="3.0"></VAST>',
-      creativeId: 'abc',
-      netRevenue: false,
-      meta: {
-        networkId: 'nid',
-        advertiserDomains: [
-          'https://the.url'
-        ],
-        secondaryCatIds: [
-          'IAB1'
-        ],
-        mediaType: 'video'
-      },
-      nurl: 'https://win.url'
-    }
+    requestId: 'f08b3a8dcff747eabada295dcf94eee0',
+    supplyId: 'c2d5cd68-b19d-4aad-ab64-4ab77853ae36',
+    cpm: 6,
+    currency: 'USD',
+    width: 300,
+    height: 250,
+    ad: '<?xml version="1.0" encoding="UTF-8" ?><VAST version="3.0"></VAST>',
+    creativeId: 'abc',
+    netRevenue: false,
+    meta: {
+      networkId: 'nid',
+      advertiserDomains: [
+        'https://the.url'
+      ],
+      secondaryCatIds: [
+        'IAB1'
+      ],
+      mediaType: 'video'
+    },
+    nurl: 'https://win.url'
   };
 
   describe('inherited functions', function () {
     it('exists and is a function', function () {
-      expect(adapter.callBids).to.exist.and.to.be.a.a('function');
+      expect(adapter.callBids).to.exist.and.to.be.a('function');
     });
   });
 
@@ -314,21 +310,22 @@ describe('AxonixBidAdapter', function () {
 
     it('ignores unparseable responses', function() {
       expect(spec.interpretResponse('invalid')).to.be.an('array').that.is.empty;
-      expect(spec.interpretResponse({ invalid: 'object' })).to.be.an('array').that.is.empty;
+      expect(spec.interpretResponse(['invalid'])).to.be.an('array').that.is.empty;
+      expect(spec.interpretResponse([{ invalid: 'object' }])).to.be.an('array').that.is.empty;
     });
 
     it('parses banner responses', function () {
-      const response = spec.interpretResponse(BANNER_RESPONSE);
+      const response = spec.interpretResponse([BANNER_RESPONSE]);
 
       expect(response).to.be.an('array').that.is.not.empty;
-      expect(response[0]).to.equal(BANNER_RESPONSE.body);
+      expect(response[0]).to.equal(BANNER_RESPONSE);
     });
 
     it('parses 1 video responses', function () {
-      const response = spec.interpretResponse(VIDEO_RESPONSE);
+      const response = spec.interpretResponse([VIDEO_RESPONSE]);
 
       expect(response).to.be.an('array').that.is.not.empty;
-      expect(response[0]).to.equal(VIDEO_RESPONSE.body);
+      expect(response[0]).to.equal(VIDEO_RESPONSE);
     });
 
     it.skip('parses 1 native responses', function () {
@@ -367,11 +364,11 @@ describe('AxonixBidAdapter', function () {
 
   describe('onTimeout', function () {
     it('banner response', () => {
-      spec.onTimeout(spec.interpretResponse(BANNER_RESPONSE));
+      spec.onTimeout(spec.interpretResponse([BANNER_RESPONSE]));
     });
 
     it('video response', () => {
-      spec.onTimeout(spec.interpretResponse(VIDEO_RESPONSE));
+      spec.onTimeout(spec.interpretResponse([VIDEO_RESPONSE]));
     });
   });
 });
