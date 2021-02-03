@@ -346,17 +346,17 @@ describe('AxonixBidAdapter', function () {
     });
 
     it('called once', function () {
-      spec.onBidWon({ cpm: '2.21', nurl: 'https://win.url/' });
+      spec.onBidWon(spec.interpretResponse([BANNER_RESPONSE]));
       expect(utils.triggerPixel.calledOnce).to.equal(true);
     });
 
     it('called false', function () {
-      spec.onBidWon({ cpm: '2.21' });
+      spec.onBidWon([{ cpm: '2.21' }]);
       expect(utils.triggerPixel.called).to.equal(false);
     });
 
     it('when there is no notification expected server side, none is called', function () {
-      var response = spec.onBidWon({});
+      var response = spec.onBidWon([]);
       expect(utils.triggerPixel.called).to.equal(false);
       expect(response).to.be.an('undefined')
     });

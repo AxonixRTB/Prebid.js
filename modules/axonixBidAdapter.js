@@ -149,13 +149,15 @@ export const spec = {
     ajax(getURL(timeoutData[0], 'prebid/timeout'), null, timeoutData[0], { method: 'POST' });
   },
 
-  onBidWon: function(bid) {
-    const { nurl } = bid || {};
+  onBidWon: function(bids) {
+    for (const bid of bids) {
+      const { nurl } = bid || {};
 
-    if (bid.nurl) {
-      utils.replaceAuctionPrice(nurl, bid.cpm)
-      utils.triggerPixel(nurl);
-    };
+      if (bid.nurl) {
+        utils.replaceAuctionPrice(nurl, bid.cpm)
+        utils.triggerPixel(nurl);
+      };
+    }
   }
 }
 
