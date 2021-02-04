@@ -139,7 +139,7 @@ export const spec = {
     const responses = [];
 
     for (const response of serverResponse) {
-      if (response.requestId && response.supplyId) {
+      if (response.requestId) {
         responses.push(Object.assign(response, {
           ttl: config.getConfig('_bidderTimeout')
         }));
@@ -150,12 +150,16 @@ export const spec = {
   },
 
   onTimeout: function(timeoutData) {
-    ajax(getURL(timeoutData[0], 'prebid/timeout'), null, timeoutData[0], {
-      method: 'POST',
-      options: {
-        withCredentials: false
-      }
-    });
+    const params = utils.deepAccess(timeoutData, '0.params.0');
+
+    if (!utils.isEmpty(params)) {
+      ajax(getURL(params, 'prebid/timeout'), null, timeoutData[0], {
+        method: 'POST',
+        options: {
+          withCredentials: false
+        }
+      });
+    }
   },
 
   onBidWon: function(bids) {

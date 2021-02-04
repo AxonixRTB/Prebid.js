@@ -72,7 +72,6 @@ describe('AxonixBidAdapter', function () {
 
   const BANNER_RESPONSE = {
     requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-    supplyId: '2f59378a-107c-4e6b-b69d-493174aece86',
     cpm: 6,
     currency: 'USD',
     width: 300,
@@ -95,7 +94,6 @@ describe('AxonixBidAdapter', function () {
 
   const VIDEO_RESPONSE = {
     requestId: 'f08b3a8dcff747eabada295dcf94eee0',
-    supplyId: 'c2d5cd68-b19d-4aad-ab64-4ab77853ae36',
     cpm: 6,
     currency: 'USD',
     width: 300,
