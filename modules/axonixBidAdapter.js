@@ -122,6 +122,7 @@ export const spec = {
         url: getURL(validBidRequest.params, 'prebid'),
         options: {
           withCredentials: false,
+          contentType: 'application/json'
         },
         data
       };
