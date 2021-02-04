@@ -67,9 +67,9 @@ export const spec = {
   isBidRequestValid: function(bid) {
     // video bid request validation
     if (bid.hasOwnProperty('mediaTypes') && bid.mediaTypes.hasOwnProperty(VIDEO)) {
-      if (!bid.mediaTypes.video.hasOwnProperty('mimes') ||
-        !utils.isArray(bid.mediaTypes.video.mimes) ||
-        bid.mediaTypes.video.mimes.length === 0) {
+      if (!bid.mediaTypes[VIDEO].hasOwnProperty('mimes') ||
+        !utils.isArray(bid.mediaTypes[VIDEO].mimes) ||
+        bid.mediaTypes[VIDEO].mimes.length === 0) {
         utils.logError('mimes are mandatory for video bid request. Ad Unit: ', JSON.stringify(bid));
 
         return false;
