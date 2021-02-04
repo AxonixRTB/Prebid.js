@@ -149,7 +149,12 @@ export const spec = {
   },
 
   onTimeout: function(timeoutData) {
-    ajax(getURL(timeoutData[0], 'prebid/timeout'), null, timeoutData[0], { method: 'POST' });
+    ajax(getURL(timeoutData[0], 'prebid/timeout'), null, timeoutData[0], {
+      method: 'POST',
+      options: {
+        withCredentials: false
+      }
+    });
   },
 
   onBidWon: function(bids) {
