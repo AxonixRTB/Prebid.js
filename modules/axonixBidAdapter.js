@@ -156,7 +156,8 @@ export const spec = {
       ajax(getURL(params, 'prebid/timeout'), null, timeoutData[0], {
         method: 'POST',
         options: {
-          withCredentials: false
+          withCredentials: false,
+          contentType: 'application/json'
         }
       });
     }
