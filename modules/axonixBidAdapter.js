@@ -120,6 +120,9 @@ export const spec = {
       return {
         method: 'POST',
         url: getURL(validBidRequest.params, 'prebid'),
+        options: {
+          withCredentials: false,
+        },
         data
       };
     });
