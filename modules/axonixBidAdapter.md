@@ -12,11 +12,12 @@ Module that connects to Axonix's exchange for bids.
 
 # Parameters
 
-| Name          | Scope    | Description                         | Example                                |
-| :------------ | :------- | :---------------------------------- | :------------------------------------- |
-| `supplyId`    | required | Supply UUID                         | `2c426f78-bb18-4a16-abf4-62c6cd0ee8de` |
-| `region`      | optional | Cloud region                        | `us-east-1`                            |
-| `endpoint`    | optional | Supply custom endpoint              | `https://open-rtb.axonix.com/custom`   |
+| Name          | Scope    | Description                                     | Example                                |
+| :------------ | :------- | :---------------------------------------------- | :------------------------------------- |
+| `supplyId`    | required | Supply UUID                                     | `"2c426f78-bb18-4a16-abf4-62c6cd0ee8de"` |
+| `region`      | optional | Cloud region                                    | `"us-east-1"`                            |
+| `endpoint`    | optional | Supply custom endpoint                          | `"https://open-rtb.axonix.com/custom"`   |
+| `instl`       | optional | Set to 1 if using interstitial (default: 0)     | `1`   |
 
 # Test Parameters
 
